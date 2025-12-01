@@ -5,10 +5,10 @@ from api.video_stats import (
   get_playlist_id,
   get_video_ids,
   extract_video_data, 
-  save_to_json
+  save_to_json,
 )
 
-from datawarehouse.dwh import staging_table,core_table
+from datawarehouse.dwh import staging_table, core_table
 
 #Define the local timezone
 local_tz = pendulum.timezone("America/New_York")
@@ -29,12 +29,16 @@ default_args = {
     # 'end_date': datetime(2030, 12, 31, tzinfo=local_tz)
 }
 
+#Variables
+staging_schema = "staging"
+core_schema = "core"
+
 with DAG(
     dag_id='produce_json',
     default_args=default_args,
     description='DAG to produce JSON file with raw data',
     schedule='0 14 * * *',
-    catchup=False
+    catchup=False,
 ) as dag:
   
     # Define tasks
@@ -51,7 +55,7 @@ with DAG(
     default_args=default_args,
     description="DAG to process JSON file and insert data into bioth staging and core schemas",
     schedule='0 15 * * *',
-    catchup=False
+    catchup=False,
 ) as dag:
   
     # Define tasks

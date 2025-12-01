@@ -12,9 +12,9 @@ table = "yt_api"
 @task
 def staging_table():
     
-    schema = 'staging'
+    schema = "staging"
 
-    conn, cur = None, None
+    conn,cur = None, None
 
     try:
         
@@ -30,20 +30,20 @@ def staging_table():
         for row in YT_data:
             
             if len(table_ids) == 0:
-                insert_rows(cur,conn,schema,row)
+                insert_rows(cur, conn, schema, row)
 
             else:
-                if row['video_id'] in table_ids:
-                    update_rows(cur,conn,schema,row)
+                if row["video_id"] in table_ids:
+                    update_rows(cur, conn, schema, row)
                 else:
-                    insert_rows(cur,conn,schema,row)
+                    insert_rows(cur, conn, schema, row)
 
-        ids_in_json = {row['video_id'] for row in YT_data}
+        ids_in_json = {row["video_id"] for row in YT_data}
 
         ids_to_delete = set(table_ids) - ids_in_json
 
         if ids_to_delete:
-            delete_rows(cur,conn,schema,ids_to_delete)
+            delete_rows(cur, conn, schema, ids_to_delete)
 
         logger.info(f"{schema} table update completed")
 
@@ -59,9 +59,9 @@ def staging_table():
 @task
 def core_table():
     
-    schema = 'core'
+    schema = "core"
 
-    conn, cur  = None, None
+    conn, cur = None, None
 
     try:
         conn, cur = get_conn_cursor()
@@ -82,13 +82,13 @@ def core_table():
 
             if len(table_ids) == 0:
                 transformed_row = transform_data(row)
-                insert_rows(cur,conn,schema,transformed_row)
+                insert_rows(cur, conn, schema, transformed_row)
 
             else:
                 transformed_row = transform_data(row)
 
                 if transformed_row["Video_ID"] in table_ids:
-                    update_rows(cur,conn,schema, transformed_row)
+                    update_rows(cur, conn, schema, transformed_row)
 
                 else:
                     insert_rows(cur, conn, schema, transformed_row)
@@ -96,7 +96,7 @@ def core_table():
         ids_to_delete = set(table_ids) - current_video_ids
 
         if ids_to_delete:
-            delete_rows(cur,conn,schema,ids_to_delete)
+            delete_rows(cur, conn, schema, ids_to_delete)
 
         logger.info(f"{schema} table update completed")
 
